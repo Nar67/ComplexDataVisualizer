@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dash:
+    build:
+      context: .
+      dockerfile: Dockerfile.dash
+    container_name: dash_dash
+    command: python app.py
+    volumes:
+      - ./app:/code
+    ports:
+      - "8888:8888"
