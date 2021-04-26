@@ -12,6 +12,7 @@ from layout.sidebar.sidebar import SIDEBAR_STYLE
 from layout.content import CONTENT_STYLE
 from layout.content import CONTENT_STYLE1
 
+from layout.upload import parse_contents
 
 
 
@@ -25,7 +26,7 @@ app.layout = layout
 @app.callback(
     [
         Output("sidebar", "style"),
-        Output("page-content", "style"),
+        Output("content", "style"),
         Output("side_click", "data"),
     ],
 
@@ -86,6 +87,19 @@ def render_page_content(pathname):
             html.P(f"The pathname {pathname} was not recognised..."),
         ]
     )
+
+
+#Callback for the upload 
+@app.callback(Output('output-data-upload', 'children'),
+              Input('upload-data', 'contents'),
+              State('upload-data', 'filename'),
+              State('upload-data', 'last_modified'))
+def update_output(list_of_contents, list_of_names, list_of_dates):
+    if list_of_contents is not None:
+        children = [
+            parse_contents(c, n, d) for c, n, d in
+            zip(list_of_contents, list_of_names, list_of_dates)]
+        return children
 
 
 
