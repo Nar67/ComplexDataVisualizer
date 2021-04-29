@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 
 
 from layout.sidebar.sidebar import sidebar
-from layout.content import content
+from layout.content.content import content
 
 navbar = dbc.NavbarSimple(
     children=[
@@ -21,7 +21,7 @@ navbar = dbc.NavbarSimple(
             label="More",
         ),
     ],
-    brand="Brand",
+    brand="Complex Data Visualizer",
     brand_href="#",
     color="dark",
     dark=True,
