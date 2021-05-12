@@ -8,7 +8,7 @@ from layout.layout import layout
 from maindash import app
 from layout.sidebar.sidebar_callbacks import *
 from layout.upload.upload_callbacks import *
-
+from layout.content.content_callbacks import *
 
 app.layout = layout
 

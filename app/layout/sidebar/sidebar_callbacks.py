@@ -29,17 +29,3 @@ def toggle_sidebar(n, nclick):
 
     return sidebar_style, content_style, cur_nclick
 
-
-
-
-# this callback uses the current pathname to set the active state of the
-# corresponding nav link to true, allowing users to tell see page they are on
-@app.callback(
-    [Output(f"page-{i}-link", "active") for i in range(1, 4)],
-    [Input("url", "pathname")],
-)
-def toggle_active_links(pathname):
-    if pathname == "/":
-        # Treat page 1 as the homepage / index
-        return True, False, False
-    return [pathname == f"/page-{i}" for i in range(1, 4)]

@@ -6,23 +6,27 @@ import dash_bootstrap_components as dbc
 
 from layout.sidebar.sidebar import sidebar
 from layout.content.content import content
+from layout.upload.upload import upload
+
+data_table = html.Div(id='table-output-data')
 
 navbar = dbc.NavbarSimple(
     children=[
-        dbc.NavItem(dbc.NavLink("Page 1", href="#")),
-        dbc.DropdownMenu(
-            children=[
-                dbc.DropdownMenuItem("More pages", header=True),
-                dbc.DropdownMenuItem("Page 2", href="#"),
-                dbc.DropdownMenuItem("Page 3", href="#"),
-            ],
-            nav=True,
-            in_navbar=True,
-            label="More",
-        ),
+        upload
+#        dbc.DropdownMenu(
+#            children=[
+#                dbc.DropdownMenuItem("More pages", header=True),
+#                dbc.DropdownMenuItem("Page 2", href="#"),
+#                dbc.DropdownMenuItem("Page 3", href="#"),
+#            ],
+#            nav=True,
+#            in_navbar=True,
+#            label="More",
+#        ),
     ],
+    id="navBar",
     brand="Complex Data Visualizer",
-    brand_href="#",
+    brand_href="/",
     color="dark",
     dark=True,
     fluid=True,

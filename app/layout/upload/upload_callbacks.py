@@ -12,10 +12,8 @@ from dash.dependencies import Input, Output, State
 
 from app import app
 
-
-
 #Callback for the upload 
-@app.callback(Output('output-data-upload', 'children'),
+@app.callback(Output('table-output-data', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))

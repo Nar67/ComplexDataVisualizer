@@ -7,9 +7,8 @@ from layout.content.content_styles import CONTENT_STYLE, BUTTON
 
 
 content = html.Div([
-    dbc.Button("-", color="dark", id="btn_sidebar", className="mr-2", style=BUTTON),
+    dbc.Button("-", color="dark", id="btn_sidebar", style=BUTTON),
     html.Div(id="page-content"),
-    upload,
 ],
 id="content",
 style=CONTENT_STYLE)

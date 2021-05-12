@@ -10,8 +10,8 @@ CONTENT_STYLE = {
 
 CONTENT_STYLE1 = {
     "transition": "margin-left .5s",
-    "margin-left": "2rem",
-    "margin-right": "2rem",
+    "margin-left": "1rem",
+    "margin-right": "1rem",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }

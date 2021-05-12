@@ -1,17 +1,22 @@
 from dash.dependencies import Input, Output, State
-import app
+from app import app
+
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 
+from layout.layout import data_table
 
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+
+@app.callback(
+    Output("page-content", "children"), 
+    Input("url", "pathname"))
 def render_page_content(pathname):
-    if pathname in ["/", "/page-1"]:
-        return html.P("This is the content of page 1!")
-    elif pathname == "/page-2":
-        return html.P("This is the content of page 2. Yay!")
+    if pathname == "/":
+        return html.Div([html.P("This is the content of Home!")])
+    elif pathname == "/table":
+        return data_table
     elif pathname == "/page-3":
-        return html.P("Oh cool, this is page 3!")
+        return html.Div([html.P("This is the content page 3")])
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
