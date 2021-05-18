@@ -34,11 +34,11 @@ def parse_contents(contents, filename, date):
 
     decoded = base64.b64decode(content_string)
     try:
-        if 'csv' in filename:
+        if '.csv' in filename:
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
-        elif 'xls' in filename:
+        elif '.xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
     except Exception as e:
@@ -49,10 +49,57 @@ def parse_contents(contents, filename, date):
 
     return html.Div([
         html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
 
         dash_table.DataTable(
             data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df.columns]
+            columns=[{'name': i, 'id': i, 'type': table_type(df[i])} for i in df.columns],
+            page_size=50,
+            sort_action='native',
+            filter_action='native',
+            sort_mode='multi',
+            
+            style_table={'overflowX': 'auto'},
+
+            style_as_list_view=True,
+
+            style_header={
+                'backgroundColor': 'white',
+                'fontWeight': 'bold',
+                'overflow': 'hidden',
+                'textOverflow': 'ellipsis',
+                'maxWidth': 0
+            },
+
+            style_cell={
+                'overflow': 'hidden',
+                'textOverflow': 'ellipsis',
+                'maxWidth': 0,
+            },
+            tooltip_data=[
+                {
+                    column: {'value': str(value), 'type': 'markdown'}
+                    for column, value in row.items()
+                } for row in df.to_dict('records')
+            ],
+            tooltip_header={i: i for i in df.columns},
+            tooltip_duration=2000
         ),
     ])
+
+def table_type(df_column):
+    if isinstance(df_column.dtype, pd.DatetimeTZDtype):
+        return 'datetime',
+    elif (isinstance(df_column.dtype, pd.StringDtype) or
+            isinstance(df_column.dtype, pd.BooleanDtype) or
+            isinstance(df_column.dtype, pd.CategoricalDtype) or
+            isinstance(df_column.dtype, pd.PeriodDtype)):
+        return 'text'
+    elif (isinstance(df_column.dtype, pd.SparseDtype) or
+            isinstance(df_column.dtype, pd.IntervalDtype) or
+            isinstance(df_column.dtype, pd.Int8Dtype) or
+            isinstance(df_column.dtype, pd.Int16Dtype) or
+            isinstance(df_column.dtype, pd.Int32Dtype) or
+            isinstance(df_column.dtype, pd.Int64Dtype)):
+        return 'numeric'
+    else:
+        return 'any'
