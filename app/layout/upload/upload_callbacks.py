@@ -58,22 +58,26 @@ def parse_contents(contents, filename, date):
             filter_action='native',
             sort_mode='multi',
             
-            style_table={'overflowX': 'auto'},
+            style_table={'overflowX': 'auto',
+                        'overflowY': 'auto',
+                        'minWidth': '100%'},
 
             style_as_list_view=True,
 
+            fixed_rows={'headers': True},
             style_header={
                 'backgroundColor': 'white',
                 'fontWeight': 'bold',
                 'overflow': 'hidden',
                 'textOverflow': 'ellipsis',
-                'maxWidth': 0
             },
 
             style_cell={
+                'minWidth': '180px',
+                'width': '180px', 
+                'maxWidth': '180px',
                 'overflow': 'hidden',
                 'textOverflow': 'ellipsis',
-                'maxWidth': 0,
             },
             tooltip_data=[
                 {
