@@ -1,4 +1,3 @@
-import dash_table
 import pandas as pd
 import base64
 import datetime
@@ -12,17 +11,18 @@ from dash.dependencies import Input, Output, State
 
 from app import app
 
+
+
+
 #Callback for the upload 
-@app.callback(Output('table-output-data', 'children'),
+@app.callback(Output('data', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-def update_output(list_of_contents, list_of_names, list_of_dates):
+              State('upload-data', 'last_modified'), prevent_initial_call=True)
+def upload_dataset(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
-        children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+        df = parse_contents(list_of_contents[0], list_of_names[0], list_of_dates[0])
+        return df.to_json(date_format='iso', orient='split')
 
 
 
@@ -31,7 +31,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
 
 def parse_contents(contents, filename, date):
     content_type, content_string = contents.split(',')
-
+    
     decoded = base64.b64decode(content_string)
     try:
         if '.csv' in filename:
@@ -46,64 +46,4 @@ def parse_contents(contents, filename, date):
         return html.Div([
             'There was an error processing this file.'
         ])
-
-    return html.Div([
-        html.H5(filename),
-
-        dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i, 'type': table_type(df[i])} for i in df.columns],
-            page_size=50,
-            sort_action='native',
-            filter_action='native',
-            sort_mode='multi',
-            
-            style_table={'overflowX': 'auto',
-                        'overflowY': 'auto',
-                        'minWidth': '100%'},
-
-            style_as_list_view=True,
-
-            fixed_rows={'headers': True},
-            style_header={
-                'backgroundColor': 'white',
-                'fontWeight': 'bold',
-                'overflow': 'hidden',
-                'textOverflow': 'ellipsis',
-            },
-
-            style_cell={
-                'minWidth': '180px',
-                'width': '180px', 
-                'maxWidth': '180px',
-                'overflow': 'hidden',
-                'textOverflow': 'ellipsis',
-            },
-            tooltip_data=[
-                {
-                    column: {'value': str(value), 'type': 'markdown'}
-                    for column, value in row.items()
-                } for row in df.to_dict('records')
-            ],
-            tooltip_header={i: i for i in df.columns},
-            tooltip_duration=2000
-        ),
-    ])
-
-def table_type(df_column):
-    if isinstance(df_column.dtype, pd.DatetimeTZDtype):
-        return 'datetime',
-    elif (isinstance(df_column.dtype, pd.StringDtype) or
-            isinstance(df_column.dtype, pd.BooleanDtype) or
-            isinstance(df_column.dtype, pd.CategoricalDtype) or
-            isinstance(df_column.dtype, pd.PeriodDtype)):
-        return 'text'
-    elif (isinstance(df_column.dtype, pd.SparseDtype) or
-            isinstance(df_column.dtype, pd.IntervalDtype) or
-            isinstance(df_column.dtype, pd.Int8Dtype) or
-            isinstance(df_column.dtype, pd.Int16Dtype) or
-            isinstance(df_column.dtype, pd.Int32Dtype) or
-            isinstance(df_column.dtype, pd.Int64Dtype)):
-        return 'numeric'
-    else:
-        return 'any'
+    return df

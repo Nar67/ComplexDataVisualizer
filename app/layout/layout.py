@@ -8,7 +8,6 @@ from layout.sidebar.sidebar import sidebar
 from layout.content.content import content
 from layout.upload.upload import upload
 
-data_table = html.Div(id='table-output-data')
 
 navbar = dbc.NavbarSimple(
     children=[

@@ -9,6 +9,8 @@ from maindash import app
 from layout.sidebar.sidebar_callbacks import *
 from layout.upload.upload_callbacks import *
 from layout.content.content_callbacks import *
+from layout.visualization.visualization_callbacks import *
+from layout.data_table.data_table_callbacks import *
 
 app.layout = layout
 

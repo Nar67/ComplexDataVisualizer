@@ -3,8 +3,11 @@ from app import app
 
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
 
-from layout.layout import data_table
+from layout.visualization.visualization import visualization
+from layout.data_table.data_table import data_table
+
 
 
 @app.callback(
@@ -15,8 +18,8 @@ def render_page_content(pathname):
         return html.Div([html.P("This is the content of Home!")])
     elif pathname == "/table":
         return data_table
-    elif pathname == "/page-3":
-        return html.Div([html.P("This is the content page 3")])
+    elif pathname == "/visualization":
+        return visualization
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
