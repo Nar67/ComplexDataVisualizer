@@ -5,6 +5,8 @@ from app import app
 
 import dash_html_components as html
 import dash_core_components as dcc
+import plotly.graph_objs as go
+
 import plotly.express as px
 
 
@@ -22,9 +24,16 @@ def update_graph(xaxis_column_name, yaxis_column_name,
     
     df = pd.read_json(dff, orient='split')
 
-    fig = px.scatter(x=df[xaxis_column_name],
-                     y=df[yaxis_column_name],)
-                     #hover_name=df[yaxis_column_name])
+    fig = go.Figure(data=[go.Scatter(
+            x=df[xaxis_column_name],
+            y=df[yaxis_column_name],
+            # name='Scatter',
+            mode= 'markers'
+    )], layout ={'paper_bgcolor': 'rgba(0,0,0,0)', 'plot_bgcolor': 'rgba(0,0,0,0)'}
+    )
+    # px.scatter(df, x=df[xaxis_column_name],
+    #                  y=df[yaxis_column_name],)
+    #                  #hover_name=df[yaxis_column_name])
 
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
