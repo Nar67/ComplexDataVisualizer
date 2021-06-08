@@ -2,6 +2,8 @@ import pandas as pd
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from app import app
+from sklearn.decomposition import PCA
+
 
 import dash_html_components as html
 import dash_core_components as dcc
@@ -31,9 +33,6 @@ def update_graph(xaxis_column_name, yaxis_column_name,
             mode= 'markers'
     )], layout ={'paper_bgcolor': 'rgba(0,0,0,0)', 'plot_bgcolor': 'rgba(0,0,0,0)'}
     )
-    # px.scatter(df, x=df[xaxis_column_name],
-    #                  y=df[yaxis_column_name],)
-    #                  #hover_name=df[yaxis_column_name])
 
     fig.update_layout(margin={'l': 40, 'b': 40, 't': 10, 'r': 0}, hovermode='closest')
 
@@ -54,7 +53,7 @@ def create_visualization(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
-
+        dbc.Button("PCA", color="primary", id="pca_btn"),
         html.Div([
             dcc.Dropdown(
                 id='xaxis-column',
@@ -83,6 +82,45 @@ def create_visualization(dff):
                 labelStyle={'display': 'inline-block'}
             )
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'}),
+
+        html.Div([
+            dcc.Dropdown(
+                id='feature-column',
+                options=[{'label': i, 'value': i} for i in df.columns],
+                value=df.columns[-1]
+            )
+        ]),
         
         dcc.Graph(id='viz-graphic')
     ])
+
+
+
+
+#Callback for the PCA button 
+@app.callback(Output('viz-graphic', 'figure'),
+              Input('pca_btn', 'n_clicks'), 
+              Input('feature-column', 'value'),
+              State('data', 'data'), prevent_initial_call=True)
+def pca(n_clicks, features, dff):
+    if dff is None:
+        raise PreventUpdate
+    
+    df = pd.read_json(dff, orient='split')
+
+    pca = PCA()
+    components = pca.fit_transform(df[features])
+    labels = {
+        str(i): f"PC {i+1} ({var:.1f}%)"
+        for i, var in enumerate(pca.explained_variance_ratio_ * 100)
+    }
+
+    fig = px.scatter_matrix(
+    components,
+    labels=labels,
+    color=df[features]
+    )
+
+    return fig
+
+
