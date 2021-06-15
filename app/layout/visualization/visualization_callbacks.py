@@ -2,11 +2,10 @@ import pandas as pd
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from app import app
-from sklearn.decomposition import PCA
-
 
 import dash_html_components as html
 import dash_core_components as dcc
+import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 
 import plotly.express as px
@@ -53,7 +52,6 @@ def create_visualization(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
-        dbc.Button("PCA", color="primary", id="pca_btn"),
         html.Div([
             dcc.Dropdown(
                 id='xaxis-column',
@@ -83,44 +81,9 @@ def create_visualization(dff):
             )
         ],style={'width': '48%', 'float': 'right', 'display': 'inline-block'}),
 
-        html.Div([
-            dcc.Dropdown(
-                id='feature-column',
-                options=[{'label': i, 'value': i} for i in df.columns],
-                value=df.columns[-1]
-            )
-        ]),
         
         dcc.Graph(id='viz-graphic')
     ])
 
-
-
-
-#Callback for the PCA button 
-@app.callback(Output('viz-graphic', 'figure'),
-              Input('pca_btn', 'n_clicks'), 
-              Input('feature-column', 'value'),
-              State('data', 'data'), prevent_initial_call=True)
-def pca(n_clicks, features, dff):
-    if dff is None:
-        raise PreventUpdate
-    
-    df = pd.read_json(dff, orient='split')
-
-    pca = PCA()
-    components = pca.fit_transform(df[features])
-    labels = {
-        str(i): f"PC {i+1} ({var:.1f}%)"
-        for i, var in enumerate(pca.explained_variance_ratio_ * 100)
-    }
-
-    fig = px.scatter_matrix(
-    components,
-    labels=labels,
-    color=df[features]
-    )
-
-    return fig
 
 
