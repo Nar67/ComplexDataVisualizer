@@ -3,13 +3,13 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from app import app
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from utils.dimensionality_reduction_visualization import create_figure
 
 
 import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
-import plotly.graph_objs as go
-from plotly.subplots import make_subplots
+
 
 
 fda_view = html.Div(id='fda-layout')
@@ -65,88 +65,12 @@ def fda(categories, n_components, color_legend, dff):
     fda = LinearDiscriminantAnalysis(n_components=n_components)
     components = fda.fit_transform(df.loc[:, df.columns != categories], df[categories])
 
-    if n_components == 2:
-        fig = go.Figure()
-        for category in df[categories].unique():
-            indexes = df.index[df[categories] == category].tolist()
-            fig.add_trace(go.Scatter(
-                    x=[components[i][0] for i in indexes],
-                    y=[components[i][1] for i in indexes],
-                    mode='markers',
-                    name=str(category),
-                    hovertemplate='<br><b>LD1</b>: %{x}<br>' + 
-                                '<br><b>LD2</b>: %{y}<br>' + 
-                                '<br><b>Index</b>: %{text}<br><extra></extra>', 
-                                text=[str(i) for i in indexes],
-            ))
-        
-        if color_legend == None or color_legend == []:
-            fig.update_traces(marker_color='blue')
-            fig.update_layout(showlegend=False)
-    
-        fig.update_xaxes(
-            title_text = "LD 1 ({var:.1f}%)".format(var=fda.explained_variance_ratio_[0]*100)
-        )
-        fig.update_yaxes(
-            title_text = "LD 2 ({var:.1f}%)".format(var=fda.explained_variance_ratio_[1]*100),
-            scaleanchor = "x",
-            scaleratio = 1,
-        )
-        return fig
-    elif n_components == 3:
-        fig = go.Figure()
-        for category in df[categories].unique():
-            indexes = df.index[df[categories] == category].tolist()
-            fig.add_trace(go.Scatter3d(
-                    x=[components[i][0] for i in indexes],
-                    y=[components[i][1] for i in indexes],
-                    z=[components[i][2] for i in indexes],
-                    mode='markers',
-                    name=str(category),
-                    hovertemplate='<br><b>LD1</b>: %{x}<br>' + 
-                                '<br><b>LD2</b>: %{y}<br>' + 
-                                '<br><b>Index</b>: %{text}<br><extra></extra>', 
-                                text=[str(i) for i in indexes],
-            ))
-        
-        if color_legend == None or color_legend == []:
-            fig.update_traces(marker_color='blue')
-            fig.update_layout(showlegend=False)
-    
-        fig.update_yaxes(
-            scaleanchor = "x",
-            scaleratio = 1,
-        )
-
-        fig.update_layout(scene = dict(
-            xaxis_title="LD 1 ({var:.1f}%)".format(var=fda.explained_variance_ratio_[0]*100),
-            yaxis_title="LD 2 ({var:.1f}%)".format(var=fda.explained_variance_ratio_[1]*100),
-            zaxis_title="LD 3 ({var:.1f}%)".format(var=fda.explained_variance_ratio_[2]*100)),
-        )
-        fig.update_scenes(aspectmode='auto') #uses 'data' which preserves the proportion of axes ranges unless one axis is 4 times the others, then 'cube' is used
-        
-        return fig      
-    else:
-        fig = make_subplots(rows=n_components , cols=n_components)
-
-        for i in range(1, n_components+1):
-            for j in range(1, n_components+1):
-                if i != j:
-                    for category in df[categories].unique():
-                        indexes = df.index[df[categories] == category].tolist()
-                        fig.add_trace(
-                            go.Scatter(
-                            x=[components[k][i-1] for k in indexes],
-                            y=[components[k][j-1] for k in indexes],
-                            mode='markers',
-                            name=str(category),
-                            hovertemplate='<br><b>x:</b>: %{x}<br>' + 
-                                        '<br><b>y:</b>: %{y}<br>' + 
-                                        '<br><b>Index</b>: %{text}<br><extra></extra>', 
-                                        text=[str(i) for i in indexes],
-                        ), row=i, col=j)
-                    fig.update_xaxes(title_text="LD {ld} ({var:.1f}%)".format(ld=i, var=fda.explained_variance_ratio_[0]*100), row=i, col=j)
-                    fig.update_yaxes(title_text="LD {ld} ({var:.1f}%)".format(ld=i, var=fda.explained_variance_ratio_[0]*100), row=i, col=j)
-
-        
-        return fig
+    return create_figure(
+                    n_components, 
+                    df, 
+                    components, 
+                    color_legend == None or color_legend == [],
+                    categories,
+                    fda.explained_variance_ratio_,
+                    fda=fda,
+            )
