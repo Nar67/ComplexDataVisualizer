@@ -8,6 +8,7 @@ import dash_core_components as dcc
 from layout.visualization.visualization import visualization
 from layout.data_table.data_table import data_table
 from layout.pca.pca_callbacks import pca_view
+from layout.fda.fda_callbacks import fda_view
 
 
 
@@ -23,6 +24,8 @@ def render_page_content(pathname):
         return visualization
     elif pathname == "/pca":
         return pca_view
+    elif pathname == "/fda":
+        return fda_view
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
