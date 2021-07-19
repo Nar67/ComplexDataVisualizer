@@ -37,10 +37,12 @@ def create_visualization_fda(dff):
         ]),
 
         html.P("Number of components:"),
-        dcc.Slider(
-            id='fda-slider',
-            min=2, max=5, value=2,
-            marks={i: str(i) for i in range(2,6)}),
+        dcc.RadioItems(
+                id='fda-components',
+                options=[{'label': i, 'value': i} for i in [2, 3]],
+                value=2,
+                labelStyle={'margin-right': '12px'}
+            ),
 
         html.Div([dcc.Graph(id='fda-graphic', style={'height': '90vh', 'width': '90vh'})],
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
@@ -53,7 +55,7 @@ def create_visualization_fda(dff):
 #Callback for the FDA 
 @app.callback(Output('fda-graphic', 'figure'),
               Input('feature-column-fda', 'value'),
-              Input("fda-slider", "value"),
+              Input("fda-components", "value"),
               Input("legend-checklist-fda", "value"),
               State('data', 'data'))
 def fda(categories, n_components, color_legend, dff):

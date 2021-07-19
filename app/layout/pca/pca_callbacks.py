@@ -37,10 +37,12 @@ def create_visualization_pca(dff):
         ]),
 
         html.P("Number of components:"),
-        dcc.Slider(
-            id='pca-slider',
-            min=2, max=5, value=2,
-            marks={i: str(i) for i in range(2,6)}),
+        dcc.RadioItems(
+                id='pca-components',
+                options=[{'label': i, 'value': i} for i in [2, 3]],
+                value=2,
+                labelStyle={'margin-right': '12px'}
+            ),
 
         html.Div([dcc.Graph(id='pca-graphic', style={'height': '90vh', 'width': '90vh'})],
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
@@ -53,7 +55,7 @@ def create_visualization_pca(dff):
 #Callback for the PCA 
 @app.callback(Output('pca-graphic', 'figure'),
               Input('feature-column', 'value'),
-              Input("pca-slider", "value"),
+              Input("pca-components", "value"),
               Input("legend-checklist", "value"),
               State('data', 'data'))
 def pca(categories, n_components, color_legend, dff):
