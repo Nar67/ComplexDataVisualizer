@@ -46,7 +46,10 @@ def create_visualization_fda(dff):
 
         html.Div([dcc.Graph(id='fda-graphic', style={'height': '90vh', 'width': '90vh'})],
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
-        )
+        ),
+
+        html.Div([dbc.Button("Export FDA", color='primary', outline=True, id="export-fda", style={'margin-right':'12px'}), dcc.Download(id="download-fda"), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-fda-coefs"), dcc.Download(id="download-fda-coefs")])
     ])
 
 
@@ -76,3 +79,45 @@ def fda(categories, n_components, color_legend, dff):
                     fda.explained_variance_ratio_,
                     fda=fda,
             )
+
+#improve both callbacks to use a stored pca instead of computing it again.
+@app.callback(
+    Output("download-fda", "data"),
+    Input("export-fda", "n_clicks"),
+    Input('feature-column-fda', 'value'),
+    Input("fda-components", "value"),
+    State('data', 'data'),
+    prevent_initial_call=True,
+)
+def download_fda(n_clicks, categories, n_components, dff):
+    if dff is None:
+        raise PreventUpdate
+            
+    df = pd.read_json(dff, orient='split')
+    
+    fda = LinearDiscriminantAnalysis(n_components=n_components)
+    components = fda.fit_transform(df.loc[:, df.columns != categories], df[categories])
+
+    df = pd.DataFrame(components, columns=[i for i in range(n_components)])
+    return dcc.send_data_frame(df.to_csv, "fda.csv")
+
+
+@app.callback(
+    Output("download-fda-coefs", "data"),
+    Input("export-fda-coefs", "n_clicks"),
+    Input('feature-column-fda', 'value'),
+    Input("fda-components", "value"),
+    State('data', 'data'),
+    prevent_initial_call=True,
+)
+def download_fda_coefs(n_clicks, categories, n_components, dff):
+    if dff is None:
+        raise PreventUpdate
+            
+    df = pd.read_json(dff, orient='split')
+    
+    fda = LinearDiscriminantAnalysis(n_components=n_components)
+    fda.fit_transform(df.loc[:, df.columns != categories], df[categories])
+
+    df = pd.DataFrame(fda.scalings_, columns=["LD{i}".format(i=i+1) for i in range(n_components)], index=df.columns[df.columns != categories])
+    return dcc.send_data_frame(df.to_csv, "fda_coefs.csv")
