@@ -1,7 +1,7 @@
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-def create_figure(n_components, df, components, color_graph, categories, explained_variance, pca=None, fda=None):
+def create_figure(n_components, df, components, color_graph, categories, explained_variance, pca=None, fda=None, mca=None):
     if pca == None and fda == None:
         return
     method_string = 'PC' if pca != None else 'LD'
@@ -88,4 +88,58 @@ def create_figure(n_components, df, components, color_graph, categories, explain
             ),
         )
         fig.update_layout(showlegend=False)   
+    return fig
+
+def create_mca_figure(n_components, df, components, explained_inertia):
+    method_string = 'Component'
+    fig = go.Figure()
+    indexes = df.index.tolist()
+    if n_components == 2:
+        fig.add_trace(go.Scatter(
+                x=components[:][0],
+                y=components[:][1],
+                mode='markers',
+                #name=str(category),
+                hovertemplate='<br><b>' + method_string + ' 1</b>: %{x}<br>' + 
+                            '<br><b>' + method_string + ' 2</b>: %{y}<br>' + 
+                            '<br><b>Index</b>: %{text}<br><extra></extra>', 
+                            text=[str(i) for i in indexes],
+        ))
+    
+        fig.update_xaxes(
+            title_text = "{ax} 1 ({var:.1f}%)".format(ax=method_string, var=explained_inertia[0]*100)
+        )
+        fig.update_yaxes(
+            title_text = "{ax} 2 ({var:.1f}%)".format(ax=method_string, var=explained_inertia[1]*100),
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
+    elif n_components == 3:
+        fig.add_trace(go.Scatter3d(
+            x=components[:][0],
+            y=components[:][1],
+            z=components[:][2],
+            mode='markers',
+            #name=str(category),
+            hovertemplate='<br><b>' + method_string + '1</b>: %{x}<br>' + 
+                        '<br><b>' + method_string + '2</b>: %{y}<br>' + 
+                        '<br><b>' + method_string + '3</b>: %{z}<br>' + 
+                        '<br><b>Index</b>: %{text}<br><extra></extra>', 
+                        text=[str(i) for i in indexes],
+            ))
+    
+        fig.update_yaxes(
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
+
+        fig.update_traces(marker_size=4)
+
+        fig.update_layout(scene = dict(
+            xaxis_title="{ax} 1 ({var:.1f}%)".format(ax=method_string, var=explained_inertia[0]*100),
+            yaxis_title="{ax} 2 ({var:.1f}%)".format(ax=method_string, var=explained_inertia[1]*100),
+            zaxis_title="{ax} 3 ({var:.1f}%)".format(ax=method_string, var=explained_inertia[2]*100),
+        ))
+        #uses 'data' which preserves the proportion of axes ranges unless one axis is 4 times the others, then 'cube' is used
+        fig.update_scenes(aspectmode='auto') 
     return fig

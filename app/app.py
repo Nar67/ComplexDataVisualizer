@@ -13,6 +13,7 @@ from layout.visualization.visualization_callbacks import *
 from layout.data_table.data_table_callbacks import *
 from layout.pca.pca_callbacks import *
 from layout.fda.fda_callbacks import *
+from layout.mca.mca_callbacks import *
 
 app.layout = layout
 
