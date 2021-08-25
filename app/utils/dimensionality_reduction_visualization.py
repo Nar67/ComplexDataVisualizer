@@ -19,6 +19,15 @@ def create_figure(n_components, df, components, color_graph, categories, explain
                                 '<br><b>Index</b>: %{text}<br><extra></extra>', 
                                 text=[str(i) for i in indexes],
             ))
+        if pca != None:
+            for i, col in enumerate(df.drop(categories, axis=1).columns):
+                fig.add_trace(go.Scatter(
+                    x = [0,pca.components_.T[i][0]],
+                    y = [0,pca.components_.T[i][1]],
+                    marker = dict(size = 1, color = "rgb(250,0,0)"),
+                    line = dict(width = 2),
+                    name = col
+                    ))
     
         fig.update_xaxes(
             title_text = "{ax} 1 ({var:.1f}%)".format(ax=method_string, var=explained_variance[0]*100)
@@ -43,6 +52,16 @@ def create_figure(n_components, df, components, color_graph, categories, explain
                                 '<br><b>Index</b>: %{text}<br><extra></extra>', 
                                 text=[str(i) for i in indexes],
             ))
+        if pca != None:
+            for i, col in enumerate(df.drop(categories, axis=1).columns):
+                fig.add_trace(go.Scatter3d(
+                    x = [0,pca.components_.T[i][0]],
+                    y = [0,pca.components_.T[i][1]],
+                    z = [0,pca.components_.T[i][2]],
+                    marker = dict(size = 1, color = "rgb(250,0,0)"),
+                    line = dict(width = 2),
+                    name = col
+                    ))
     
         fig.update_yaxes(
             scaleanchor = "x",
@@ -57,37 +76,7 @@ def create_figure(n_components, df, components, color_graph, categories, explain
             zaxis_title="{ax} 3 ({var:.1f}%)".format(ax=method_string, var=explained_variance[2]*100),
         ))
         #uses 'data' which preserves the proportion of axes ranges unless one axis is 4 times the others, then 'cube' is used
-        fig.update_scenes(aspectmode='auto') 
-    else:
-        fig = make_subplots(rows=n_components , cols=n_components)
-
-        for i in range(1, n_components+1):
-            for j in range(1, n_components+1):
-                if i != j:
-                    for category in df[categories].unique():
-                        indexes = df.index[df[categories] == category].tolist()
-                        fig.add_trace(
-                            go.Scatter(
-                            x=[components[k][i-1] for k in indexes],
-                            y=[components[k][j-1] for k in indexes],
-                            mode='markers',
-                            name=str(category),
-                            hovertemplate='<br><b>x:</b>: %{x}<br>' + 
-                                        '<br><b>y:</b>: %{y}<br>' + 
-                                        '<br><b>Index</b>: %{text}<br><extra></extra>', 
-                                        text=[str(i) for i in indexes],
-                        ), row=i, col=j)
-                    fig.update_xaxes(title_text="{ax} {ld} ({var:.1f}%)".format(ax=method_string, ld=i, var=explained_variance[i-1]*100), row=i, col=j)
-                    fig.update_yaxes(title_text="{ax} {ld} ({var:.1f}%)".format(ax=method_string, ld=i, var=explained_variance[j-1]*100), row=i, col=j)
-
-    if color_graph and fda == None:
-        fig.update_traces(
-            marker_color='blue',
-            marker=dict(
-                color='blue'
-            ),
-        )
-        fig.update_layout(showlegend=False)   
+        fig.update_scenes(aspectmode='auto')  
     return fig
 
 def create_mca_figure(n_components, df, components, explained_inertia):

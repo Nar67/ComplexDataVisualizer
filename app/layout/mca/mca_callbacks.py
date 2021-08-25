@@ -58,8 +58,6 @@ def mca(n_components, dff):
     mca = MCA(n_components=n_components)
     components = mca.fit_transform(df)
 
-    print(mca.explained_inertia_)
-
     return create_mca_figure(
                     n_components, 
                     df, 
