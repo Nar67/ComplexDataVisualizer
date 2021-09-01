@@ -14,6 +14,8 @@ from layout.data_table.data_table_callbacks import *
 from layout.pca.pca_callbacks import *
 from layout.fda.fda_callbacks import *
 from layout.mca.mca_callbacks import *
+from layout.tSNE.tSNE_callbacks import *
+
 
 app.layout = layout
 
