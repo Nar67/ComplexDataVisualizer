@@ -1,8 +1,8 @@
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-def create_figure(n_components, df, components, color_graph, categories, explained_variance, pca=None, fda=None, mca=None):
-    if pca == None and fda == None:
+def create_figure(n_components, df, components, color_graph, categories, explained_variance, pca=None, fda=None, kpca=None):
+    if pca == None and fda == None and kpca == None:
         return
     method_string = 'PC' if pca != None else 'LD'
     fig = go.Figure()
