@@ -16,6 +16,7 @@ from layout.fda.fda_callbacks import *
 from layout.mca.mca_callbacks import *
 from layout.tSNE.tSNE_callbacks import *
 from layout.KPCA.KPCA_callbacks import *
+from layout.mds.mds_callbacks import *
 
 
 app.layout = layout

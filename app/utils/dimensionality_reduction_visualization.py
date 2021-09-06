@@ -176,3 +176,51 @@ def create_figure_tSNE(n_components, df, components, color_graph, categories, di
     )
     fig.update_layout(title='Divergence: {div}'.format(div=divergence))
     return fig
+
+def create_mds_figure(n_components, df, components, categories, stress):
+    method_string = 'Dimension '
+    fig = go.Figure()
+    indexes = df.index.tolist()
+    if n_components == 2:
+        for category in df[categories].unique():
+            indexes = df.index[df[categories] == category].tolist()
+            fig.add_trace(go.Scatter(
+                    x=[components[i][0] for i in indexes],
+                    y=[components[i][1] for i in indexes],
+                    mode='markers',
+                    name=str(category),
+                    hovertemplate='<br><b>X</b>: %{x}<br>' + 
+                                '<br><b>Y</b>: %{y}<br>' + 
+                                '<br><b>Index</b>: %{text}<br><extra></extra>', 
+                                text=[str(i) for i in indexes],
+            ))
+        fig.update_yaxes(
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
+    elif n_components == 3:
+        for category in df[categories].unique():
+            indexes = df.index[df[categories] == category].tolist()
+            fig.add_trace(go.Scatter3d(
+                    x=[components[i][0] for i in indexes],
+                    y=[components[i][1] for i in indexes],
+                    z=[components[i][2] for i in indexes],
+                    mode='markers',
+                    name=str(category),
+                    hovertemplate='<br><b>X</b>: %{x}<br>' + 
+                                '<br><b>Y</b>: %{y}<br>' + 
+                                '<br><b>Z</b>: %{z}<br>' + 
+                                '<br><b>Index</b>: %{text}<br><extra></extra>', 
+                                text=[str(i) for i in indexes],
+            ))
+        fig.update_yaxes(
+            scaleanchor = "x",
+            scaleratio = 1,
+        )
+
+        fig.update_traces(marker_size=4)
+        #uses 'data' which preserves the proportion of axes ranges unless one axis is 4 times the others, then 'cube' is used
+        fig.update_scenes(aspectmode='auto')
+    fig.update_layout(title='Stress: {st}'.format(st=stress))
+
+    return fig

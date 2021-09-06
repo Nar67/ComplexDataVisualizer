@@ -12,6 +12,7 @@ from layout.fda.fda_callbacks import fda_view
 from layout.mca.mca_callbacks import mca_view
 from layout.tSNE.tSNE_callbacks import tSNE_view
 from layout.KPCA.KPCA_callbacks import KPCA_view
+from layout.mds.mds_callbacks import mds_view
 
 
 
@@ -36,6 +37,8 @@ def render_page_content(pathname):
         return tSNE_view
     elif pathname == "/KPCA":
         return KPCA_view
+    elif pathname == "/mds":
+        return mds_view
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [
