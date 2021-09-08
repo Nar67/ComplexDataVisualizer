@@ -77,7 +77,7 @@ def fda(categories, n_components, color_legend, dff):
                     color_legend == None or color_legend == [],
                     categories,
                     fda.explained_variance_ratio_,
-                    fda=fda,
+                    method='fda'
             )
 
 #improve both callbacks to use a stored pca instead of computing it again.

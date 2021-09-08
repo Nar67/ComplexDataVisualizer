@@ -74,5 +74,5 @@ def KPCA(categories, n_components, color_legend, dff):
                     color_legend == None or color_legend == [],
                     categories,
                     KPCA.lambdas_,
-                    kpca=KPCA
+                    method='kpca'
             )

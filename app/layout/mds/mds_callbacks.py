@@ -63,9 +63,6 @@ def mds(n_components, categories, color_legend, dff):
             
     df = pd.read_json(dff, orient='split')
 
-    # if not check_all_categorical(df):
-    #     return
-
     mds = MDS(n_components=n_components)
     components = mds.fit_transform(df.loc[:, df.columns != categories])
 
@@ -73,6 +70,7 @@ def mds(n_components, categories, color_legend, dff):
                     n_components, 
                     df, 
                     components,
+                    True,
                     categories,
                     mds.stress_,
             )

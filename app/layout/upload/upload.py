@@ -3,8 +3,6 @@ import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 
 
-from layout.upload.upload_styles import UPLOAD_STYLE
-
 upload = html.Div([
     dcc.Upload(
         id='upload-data',

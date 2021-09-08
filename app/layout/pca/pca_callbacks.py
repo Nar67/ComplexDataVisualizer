@@ -77,7 +77,8 @@ def pca(categories, n_components, color_legend, dff):
                     color_legend == None or color_legend == [],
                     categories,
                     pca.explained_variance_ratio_,
-                    pca=pca,
+                    method='pca',
+                    pca=pca
             )
 
 
