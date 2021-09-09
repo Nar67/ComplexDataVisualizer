@@ -23,6 +23,7 @@ def create_visualization_pca(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'pca'}, storage_type='session'),
         html.P("Choose labels column"),
         html.Div([
             dcc.Dropdown(
@@ -48,8 +49,10 @@ def create_visualization_pca(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export PCA", color='primary', outline=True, id="export-pca", style={'margin-right':'12px'}), dcc.Download(id="download-pca"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-pca-coefs"), dcc.Download(id="download-pca-coefs")])
+        html.Div([dbc.Button("Export PCA", color='primary', outline=True, id={'type': 'export_points', 'method': 'pca'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'pca'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'pca'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'pca'})])
     ])
 
 
@@ -57,6 +60,7 @@ def create_visualization_pca(dff):
 
 #Callback for the PCA 
 @app.callback(Output('pca-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'pca'}, 'data'),
               Input('feature-column', 'value'),
               Input("pca-components", "value"),
               Input("legend-checklist", "value"),
@@ -79,45 +83,59 @@ def pca(categories, n_components, color_legend, dff):
                     pca.explained_variance_ratio_,
                     method='pca',
                     pca=pca
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')
 
 
-#improve both callbacks to use a stored pca instead of computing it again.
-@app.callback(
-    Output("download-pca", "data"),
-    Input("export-pca", "n_clicks"),
-    Input('feature-column', 'value'),
-    Input("pca-components", "value"),
-    State('data', 'data'),
-    prevent_initial_call=True,
-)
-def download_pca(n_clicks, categories, n_components, dff):
-    if dff is None:
-        raise PreventUpdate
+# #improve both callbacks to use a stored pca instead of computing it again.
+# @app.callback(
+#     Output("download-pca", "data"),
+#     Input("export-pca", "n_clicks"),
+#     State('feature-column', 'value'),
+#     State("pca-components", "value"),
+#     State('data', 'data'),
+#     prevent_initial_call=True,
+# )
+# def download_pca(n_clicks, categories, n_components, dff):
+#     if dff is None:
+#         raise PreventUpdate
             
-    df = pd.read_json(dff, orient='split')
-    pca = PCA(n_components=n_components)
-    components = pca.fit_transform(df.loc[:, df.columns != categories])
+#     df = pd.read_json(dff, orient='split')
+#     pca = PCA(n_components=n_components)
+#     components = pca.fit_transform(df.loc[:, df.columns != categories])
 
-    df = pd.DataFrame(components, columns=[i for i in range(n_components)])
-    return dcc.send_data_frame(df.to_csv, "pca.csv")
+#     df = pd.DataFrame(components, columns=[i for i in range(n_components)])
+#     return dcc.send_data_frame(df.to_csv, "pca.csv")
 
 
-@app.callback(
-    Output("download-pca-coefs", "data"),
-    Input("export-pca-coefs", "n_clicks"),
-    Input('feature-column', 'value'),
-    Input("pca-components", "value"),
-    State('data', 'data'),
-    prevent_initial_call=True,
-)
-def download_pca_coefs(n_clicks, categories, n_components, dff):
-    if dff is None:
-        raise PreventUpdate
+# @app.callback(
+#     Output("download-pca-coefs", "data"),
+#     Input("export-pca-coefs", "n_clicks"),
+#     State('feature-column', 'value'),
+#     State("pca-components", "value"),
+#     State('data', 'data'),
+#     prevent_initial_call=True,
+# )
+# def download_pca_coefs(n_clicks, categories, n_components, dff):
+#     if dff is None:
+#         raise PreventUpdate
             
-    df = pd.read_json(dff, orient='split')
-    pca = PCA(n_components=n_components)
-    pca.fit_transform(df.loc[:, df.columns != categories])
+#     df = pd.read_json(dff, orient='split')
+#     pca = PCA(n_components=n_components)
+#     pca.fit_transform(df.loc[:, df.columns != categories])
 
-    df = pd.DataFrame(pca.components_.T, columns=["PC{i}".format(i=i+1) for i in range(n_components)], index=df.columns[df.columns != categories])
-    return dcc.send_data_frame(df.to_csv, "pca_coefs.csv")
+#     df = pd.DataFrame(pca.components_.T, columns=["PC{i}".format(i=i+1) for i in range(n_components)], index=df.columns[df.columns != categories])
+#     return dcc.send_data_frame(df.to_csv, "pca_coefs.csv")
+
+
+# #improve both callbacks to use a stored pca instead of computing it again.
+# @app.callback(
+#     Output("download-pca", "data"),
+#     Input("export-pca", "n_clicks"),
+#     State("pca_points", "value"),
+#     prevent_initial_call=True,
+# )
+# def download_pca(n_clicks, data):
+            
+#     df = pd.read_json(data, orient='split')
+#     #df = pd.DataFrame(components, columns=[i for i in range(n_components)])
+#     return dcc.send_data_frame(df.to_csv, "pca.csv")

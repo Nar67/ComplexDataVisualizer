@@ -22,6 +22,7 @@ def create_visualization_mds(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'mds'}, storage_type='session'),
         html.P("Choose labels column"),
         html.Div([
             dcc.Dropdown(
@@ -46,13 +47,16 @@ def create_visualization_mds(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export mds", color='primary', outline=True, id="export-mds", style={'margin-right':'12px'}), dcc.Download(id="download-mds"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-mds-coefs"), dcc.Download(id="download-mds-coefs")])
+        html.Div([dbc.Button("Export MDS", color='primary', outline=True, id={'type': 'export_points', 'method': 'mds'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'mds'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'mds'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'mds'})])
     ])
 
 
 #Callback for the mds 
 @app.callback(Output('mds-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'mds'}, 'data'),
               Input("mds-components", "value"),
               Input('feature-column', 'value'),
               Input("legend-checklist", "value"),
@@ -73,4 +77,4 @@ def mds(n_components, categories, color_legend, dff):
                     True,
                     categories,
                     mds.stress_,
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')

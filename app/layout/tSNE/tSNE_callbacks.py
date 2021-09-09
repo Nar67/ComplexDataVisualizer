@@ -22,6 +22,7 @@ def create_visualization_tSNE(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'tSNE'}, storage_type='session'),
         html.P("Choose labels column"),
         html.Div([
             dcc.Dropdown(
@@ -46,14 +47,17 @@ def create_visualization_tSNE(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export tSNE", color='primary', outline=True, id="export-tSNE", style={'margin-right':'12px'}), dcc.Download(id="download-tSNE"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-tSNE-coefs"), dcc.Download(id="download-tSNE-coefs")])
+        html.Div([dbc.Button("Export tSNE", color='primary', outline=True, id={'type': 'export_points', 'method': 'tSNE'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'tSNE'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'tSNE'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'tSNE'})])
     ])
 
 
 
 #Callback for the tSNE 
 @app.callback(Output('tSNE-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'tSNE'}, 'data'),
               Input('feature-column', 'value'),
               Input("tSNE-components", "value"),
               Input("legend-checklist", "value"),
@@ -74,4 +78,4 @@ def tSNE(categories, n_components, color_legend, dff):
                     color_legend == None or color_legend == [],
                     categories,
                     tSNE.kl_divergence_
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')

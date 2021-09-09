@@ -23,6 +23,7 @@ def create_visualization_fda(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'fda'}, storage_type='session'),
         html.P("Choose labels column"),
         html.Div([
             dcc.Dropdown(
@@ -48,8 +49,10 @@ def create_visualization_fda(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export FDA", color='primary', outline=True, id="export-fda", style={'margin-right':'12px'}), dcc.Download(id="download-fda"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-fda-coefs"), dcc.Download(id="download-fda-coefs")])
+        html.Div([dbc.Button("Export FDA", color='primary', outline=True, id={'type': 'export_points', 'method': 'fda'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'fda'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'fda'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'fda'})])
     ])
 
 
@@ -57,6 +60,7 @@ def create_visualization_fda(dff):
 
 #Callback for the FDA 
 @app.callback(Output('fda-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'fda'}, 'data'),
               Input('feature-column-fda', 'value'),
               Input("fda-components", "value"),
               Input("legend-checklist-fda", "value"),
@@ -78,7 +82,7 @@ def fda(categories, n_components, color_legend, dff):
                     categories,
                     fda.explained_variance_ratio_,
                     method='fda'
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')
 
 #improve both callbacks to use a stored pca instead of computing it again.
 @app.callback(

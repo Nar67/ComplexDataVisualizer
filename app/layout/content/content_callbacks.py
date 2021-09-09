@@ -39,6 +39,8 @@ def render_page_content(pathname):
         return KPCA_view
     elif pathname == "/mds":
         return mds_view
+    elif pathname == "/upload":
+        return upload_view
     # If the user tries to reach a different page, return a 404 message
     return dbc.Jumbotron(
         [

@@ -22,6 +22,7 @@ def create_visualization_KPCA(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'kpca'}, storage_type='session'),
         html.P("Choose labels column"),
         html.Div([
             dcc.Dropdown(
@@ -46,14 +47,17 @@ def create_visualization_KPCA(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export KPCA", color='primary', outline=True, id="export-KPCA", style={'margin-right':'12px'}), dcc.Download(id="download-KPCA"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-KPCA-coefs"), dcc.Download(id="download-KPCA-coefs")])
+        html.Div([dbc.Button("Export KPCA", color='primary', outline=True, id={'type': 'export_points', 'method': 'kpca'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'kpca'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'kpca'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'kpca'})])
     ])
 
 
 
 #Callback for the KPCA 
 @app.callback(Output('KPCA-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'kpca'}, 'data'),
               Input('feature-column', 'value'),
               Input("KPCA-components", "value"),
               Input("legend-checklist", "value"),
@@ -75,4 +79,4 @@ def KPCA(categories, n_components, color_legend, dff):
                     categories,
                     KPCA.lambdas_,
                     method='kpca'
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')

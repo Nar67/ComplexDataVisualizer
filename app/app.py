@@ -18,6 +18,8 @@ from layout.tSNE.tSNE_callbacks import *
 from layout.KPCA.KPCA_callbacks import *
 from layout.mds.mds_callbacks import *
 
+from utils.generic_callbacks import *
+
 
 app.layout = layout
 

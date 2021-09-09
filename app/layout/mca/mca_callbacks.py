@@ -23,6 +23,7 @@ def create_visualization_mca(dff):
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
+        dcc.Store(id={'type': 'points', 'method': 'mca'}, storage_type='session'),
         html.P("Number of components:"),
         dcc.RadioItems(
                 id='mca-components',
@@ -35,8 +36,10 @@ def create_visualization_mca(dff):
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
         ),
 
-        html.Div([dbc.Button("Export MCA", color='primary', outline=True, id="export-mca", style={'margin-right':'12px'}), dcc.Download(id="download-mca"), 
-                  dbc.Button("Export Coefs", color='primary', outline=True, id="export-mca-coefs"), dcc.Download(id="download-mca-coefs")])
+        html.Div([dbc.Button("Export MCA",  color='primary', outline=True, id={'type': 'export_points', 'method': 'mca'}, style={'margin-right':'12px'}),
+                     dcc.Download(id={'type': 'download_points_btn', 'method' : 'mca'}), 
+                  dbc.Button("Export Coefs", color='primary', outline=True, id={'type': 'export_coefs', 'method': 'mca'}, style={'margin-right':'12px'}), 
+                    dcc.Download(id={'type': 'download_coefs_btn', 'method' : 'mca'})])
     ])
 
 
@@ -44,6 +47,7 @@ def create_visualization_mca(dff):
 
 #Callback for the mca 
 @app.callback(Output('mca-graphic', 'figure'),
+              Output({'type': 'points', 'method': 'mca'}, 'data'),
               Input("mca-components", "value"),
               State('data', 'data'))
 def mca(n_components, dff):
@@ -63,7 +67,7 @@ def mca(n_components, dff):
                     df, 
                     components, 
                     mca.explained_inertia_,
-            )
+            ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')
 
 
 # #improve both callbacks to use a stored mca instead of computing it again.
