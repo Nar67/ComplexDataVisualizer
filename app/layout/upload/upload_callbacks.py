@@ -13,19 +13,33 @@ from app import app
 
 
 
+@app.callback(Output("url", "pathname"),
+              Input('upload_btn', 'n_clicks'), prevent_initial_call=True)
+def upload_view(n_clicks):
+    return "/upload"
+
+@app.callback(Output('categorical_input', 'hidden'),
+              Input('dataset-kind', 'value'))
+def show_input(kind):
+    return kind != 'mixed'
+
 
 #Callback for the upload 
 @app.callback(Output('data', 'data'),
+              Output('dataset-type', 'data'),
+              Output('dataset-column-text', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'), prevent_initial_call=True)
-def upload_dataset(list_of_contents, list_of_names, list_of_dates):
-    if list_of_contents is not None:
-        df = parse_contents(list_of_contents[0], list_of_names[0], list_of_dates[0])
-        return df.to_json(date_format='iso', orient='split')
-
-
-
+              State('upload-data', 'last_modified'), 
+              State('dataset-kind', 'value'), 
+              State('categorical_column_input', 'value'), 
+              prevent_initial_call=True)
+def upload_dataset(content, name, dates, dataset_kind, column_text):
+    if content is not None:
+        df = parse_contents(content, name, dates)
+        return df.to_json(date_format='iso', orient='split'), dataset_kind, column_text
+    else:
+        return None, None, None
 
 
 

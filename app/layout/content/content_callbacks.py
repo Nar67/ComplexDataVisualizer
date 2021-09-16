@@ -13,6 +13,7 @@ from layout.mca.mca_callbacks import mca_view
 from layout.tSNE.tSNE_callbacks import tSNE_view
 from layout.KPCA.KPCA_callbacks import KPCA_view
 from layout.mds.mds_callbacks import mds_view
+from layout.upload.upload import upload_view
 
 
 

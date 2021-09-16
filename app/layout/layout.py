@@ -6,12 +6,11 @@ import dash_bootstrap_components as dbc
 
 from layout.sidebar.sidebar import sidebar
 from layout.content.content import content
-from layout.upload.upload import upload
 
 
 navbar = dbc.NavbarSimple(
     children=[
-        upload
+        dbc.Button("Upload", color="primary", id="upload_btn")
 #        dbc.DropdownMenu(
 #            children=[
 #                dbc.DropdownMenuItem("More pages", header=True),
