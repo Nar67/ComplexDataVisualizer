@@ -113,7 +113,8 @@ def draw_arrows(fig, n_components, df, components, categories):
                 y = [0,components[i][1]],
                 marker = dict(size = 1, color = "rgb(250,0,0)"),
                 line = dict(width = 2),
-                name = col
+                name = col,
+                showlegend=False
             ))
     elif n_components == 3:
         for i, col in enumerate(df.drop(categories, axis=1).columns):
@@ -123,5 +124,6 @@ def draw_arrows(fig, n_components, df, components, categories):
                 z = [0,components[i][2]],
                 marker = dict(size = 1, color = "rgb(250,0,0)"),
                 line = dict(width = 2),
-                name = col
+                name = col,
+                showlegend=False
             ))

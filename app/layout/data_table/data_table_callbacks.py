@@ -13,16 +13,13 @@ from layout.data_table.data_table import data_table
 
 #Callback for the upload 
 @app.callback(Output('table-output-data', 'children'),
-              Input('data', 'data'),
-              State('upload-data', 'filename'))
-def create_table(dff, filename):
-    if dff is None or filename is None:
+              Input('data', 'data'))
+def create_table(dff):
+    if dff is None:
         raise PreventUpdate
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
-        html.H5(filename),
-
         dash_table.DataTable(
             data=df.to_dict('records'),
             columns=[{'name': i, 'id': i, 'type': table_type(df[i])} for i in df.columns],
