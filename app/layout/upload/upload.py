@@ -4,7 +4,6 @@ import dash_bootstrap_components as dbc
 
 
 upload_view = html.Div([
-    dcc.Store("dataset-info", storage_type='session'),
     dcc.Store("predata"),
     html.Div(id='upload-comp', hidden=False, children=[
         dcc.Upload(

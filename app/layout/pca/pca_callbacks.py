@@ -15,35 +15,54 @@ import dash_bootstrap_components as dbc
 pca_view = html.Div(id='pca-layout')
 
 
+@app.callback(Output('tolerance-div', 'hidden'),
+              Input('svd-solver', 'value'))
+def show_input(solver):
+    return solver != 'arpack'
+
+
 @app.callback(Output('pca-layout', 'children'),
-              Input('data', 'data'))
-def create_visualization_pca(dff):
+              Input('data', 'data'),
+              State('dataset-info', 'data'))
+def create_visualization_pca(dff, ds_info):
     if dff is None:
         raise PreventUpdate
         return []
     df = pd.read_json(dff, orient='split')
     return html.Div([
         dcc.Store(id={'type': 'points', 'method': 'pca'}, storage_type='session'),
-        html.P("Choose labels column"),
-        html.Div([
+        dcc.Markdown('''
+            ##### Choose SVD solver:
+            '''),
+            html.Div([
             dcc.Dropdown(
-                id='feature-column',
-                options=[{'label': i, 'value': i} for i in df.columns],
-                value=df.columns[-1]
+                id='svd-solver',
+                options=[{'label': i, 'value': i} for i in ['auto', 'full', 'arpack', 'randomized']],
+                value='auto'
             ),
-            dcc.Checklist(
-                id='legend-checklist',
-                options=[{'label': 'Color plot using labels column', 'value': 'True'}]
+            html.Div(id='tolerance-div', hidden=True, children=[
+                dcc.Markdown('''
+                    ##### Choose tolerance for singular values:
+                    '''),                
+                dcc.Input(
+                id='tolerance',
+                placeholder='0.0',
+                type='number'
                 )
+            ])
         ]),
 
-        html.P("Number of components:"),
+        dcc.Markdown('''
+            ##### Number of components:
+            '''),
         dcc.RadioItems(
                 id='pca-components',
                 options=[{'label': i, 'value': i} for i in [2, 3]],
                 value=2,
                 labelStyle={'margin-right': '12px'}
             ),
+
+        dbc.Button("Generate", color='primary', outline=True, id={'generate': 'pca'}),
 
         html.Div([dcc.Graph(id='pca-graphic', style={'height': '90vh', 'width': '90vh'})],
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
@@ -61,25 +80,29 @@ def create_visualization_pca(dff):
 #Callback for the PCA 
 @app.callback(Output('pca-graphic', 'figure'),
               Output({'type': 'points', 'method': 'pca'}, 'data'),
-              Input('feature-column', 'value'),
-              Input("pca-components", "value"),
-              Input("legend-checklist", "value"),
-              State('data', 'data'))
-def pca(categories, n_components, color_legend, dff):
+              Input({'generate': 'pca'}, 'n_clicks'),
+              State("pca-components", "value"),
+              State('data', 'data'),
+              State('dataset-info', 'data'),
+              State('svd-solver', 'value'),
+              State('tolerance', 'value'),
+              prevent_initial_call=True)
+def pca(n_clicks, n_components, dff, ds_info, solver, tolerance):
     if dff is None:
         raise PreventUpdate
+    
             
     df = pd.read_json(dff, orient='split')
 
     pca = PCA(n_components=n_components)
-    components = pca.fit_transform(df.loc[:, df.columns != categories])
-
+    components = pca.fit_transform(df.loc[:, df.columns != ds_info['label_column']])
+    print('PCA done!')
     return create_figure(
                     n_components, 
                     df, 
                     components, 
-                    color_legend == None or color_legend == [],
-                    categories,
+                    ds_info['labeled'],
+                    ds_info['label_column'],
                     pca.explained_variance_ratio_,
                     method='pca',
                     pca=pca
