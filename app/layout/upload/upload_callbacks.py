@@ -16,6 +16,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.impute import KNNImputer
 
+from detect_delimiter import detect
+
 from app import app
 
 
@@ -77,8 +79,8 @@ def save_upload_options(n_clicks, dataset_kind, column_text, labeled, label_colu
         raise PreventUpdate        
     df = pd.read_json(dff, orient='split')
     
-    if convert == 'convert':
-        df = convert_vars(df, parse_categorical_column_text(column_text))
+    if convert != 'ignore':
+        df = convert_vars(df, parse_categorical_column_text(column_text), convert)
     
     if missing_values == 'impute':
         df = impute_missing(df)
@@ -90,8 +92,8 @@ def save_upload_options(n_clicks, dataset_kind, column_text, labeled, label_colu
             df.to_json(date_format='iso', orient='split')
 
 
-def convert_vars(df, categorical_cols):
-    if df.shape[1]/2 > len(categorical_cols): #majority of numerical, converting categorical to numerical
+def convert_vars(df, categorical_cols, convert):
+    if 'numerical' in convert: #majority of numerical, converting categorical to numerical
         return pd.get_dummies(df, columns=[df.columns[i] for i in categorical_cols])
     else: #converting numerical to categorical
         return discretize(df, [df.columns[i] for i in categorical_cols])
@@ -127,8 +129,8 @@ def parse_contents(contents, filename, date):
     try:
         if '.csv' in filename:
             # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
+            delimiter = detect(io.StringIO(decoded.decode('utf-8')).getvalue().split('\n')[0])
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')), sep = delimiter)
         elif '.xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded))
