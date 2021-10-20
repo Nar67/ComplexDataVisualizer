@@ -40,7 +40,7 @@ def create_visualization_KPCA(dff, ds_info):
         dcc.Markdown('''
             ##### Choose Kernel for the PCA:
             '''),
-            html.Div([
+        html.Div([
             dcc.Dropdown(
                 id='kernel',
                 options=[{'label': i, 'value': i} for i in ['linear', 'poly', 'rbf', 'sigmoid', 'cosine', 'precomputed']],
@@ -51,29 +51,29 @@ def create_visualization_KPCA(dff, ds_info):
                     ##### Choose gamma for rbf, poly and sigmoid kernels:
                     '''),                
                 dcc.Input(
-                id='gamma',
-                placeholder='0.0',
-                type='number'
+                    id='gamma',
+                    placeholder='0.0',
+                    type='number'
                 )
             ]),
-            html.Div(id={'div': 'degree-div'}, hidden=True, children=[
+            html.Div(id={'kpca-div': 'degree-div'}, hidden=True, children=[
                 dcc.Markdown('''
                     ##### Choose degree for poly kernels:
                     '''),                
                 dcc.Input(
-                id='degree',
-                placeholder='0',
-                type='number'
+                    id='degree',
+                    placeholder='3',
+                    type='number'
                 )
             ]),
-            html.Div(id={'div': 'coef0-div'}, hidden=True, children=[
+            html.Div(id={'kpca-div': 'coef0-div'}, hidden=True, children=[
                 dcc.Markdown('''
                     ##### Choose independent term for poly and sigmoid kernels:
                     '''),                
                 dcc.Input(
-                id='coef0',
-                placeholder='0',
-                type='number'
+                    id='coef0',
+                    placeholder='1',
+                    type='number'
                 )
             ]),
         ]),
@@ -108,17 +108,23 @@ def create_visualization_KPCA(dff, ds_info):
               Input({'generate': 'kpca'}, 'n_clicks'),
               State("KPCA-components", "value"),
               State('data', 'data'),
-              State('dataset-info', 'data'),
               State('kernel', 'value'),
               State('gamma', 'value'),
+              State('degree', 'value'),
+              State('coef0', 'value'),
+              State('dataset-info', 'data'),
               prevent_initial_call=True)
-def KPCA(n_clicks, n_components, dff, ds_info, kernel, gamma):
+def KPCA(n_clicks, n_components, dff, kernel, gamma, degree, coef0, ds_info):
     if dff is None:
         raise PreventUpdate
             
     df = pd.read_json(dff, orient='split')
 
-    KPCA = KernelPCA(n_components=n_components, kernel=kernel, gamma=gamma)
+    KPCA = KernelPCA(n_components=n_components, 
+                     kernel=kernel, 
+                     gamma=gamma, 
+                     degree=degree if degree is not None else 3, 
+                     coef0=coef0 if coef0 is not None else 1)
     components = KPCA.fit_transform(df.loc[:, df.columns != ds_info['label_column']])
     return create_figure(
                     n_components, 

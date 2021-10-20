@@ -49,9 +49,9 @@ def create_visualization_lda(dff):
                     '''),                
                 dcc.Input(
                 id='shrinkage',
-                placeholder='\'auto\', \'None\' or float [0-1]',
+                placeholder='Empty, \'auto\' or float [0-1]',
                 type='text',
-                pattern='(auto)|(None)|(^(?:0*(?:\.\d+)?|1(\.0*)?)$)'
+                pattern='(auto)|^$|(^(?:0*(?:\.\d+)?|1(\.0*)?)$)'
                 )
             ])]),
 
@@ -96,8 +96,13 @@ def lda(n_clicks, n_components, dff, solver, shrinkage, ds_info):
         raise PreventUpdate
             
     df = pd.read_json(dff, orient='split')
+    
+    if solver == 'eigen':
+        shrinkage = shrinkage if shrinkage == 'auto' or shrinkage is None else float(shrinkage)
+    else:
+        shrinkage = None
 
-    lda = LinearDiscriminantAnalysis(n_components=n_components, solver=solver, shrinkage= None if shrinkage == 'None' else shrinkage)
+    lda = LinearDiscriminantAnalysis(n_components=n_components, solver=solver, shrinkage=shrinkage)
     components = lda.fit_transform(df.loc[:, df.columns != ds_info['label_column']], df[ds_info['label_column']])
 
     return create_figure(

@@ -96,7 +96,6 @@ def pca(n_clicks, n_components, dff, ds_info, solver, tolerance):
 
     pca = PCA(n_components=n_components)
     components = pca.fit_transform(df.loc[:, df.columns != ds_info['label_column']])
-    print('PCA done!')
     return create_figure(
                     n_components, 
                     df, 

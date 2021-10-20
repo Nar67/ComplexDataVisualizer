@@ -24,13 +24,18 @@ def create_visualization_mca(dff):
     df = pd.read_json(dff, orient='split')
     return html.Div([
         dcc.Store(id={'type': 'points', 'method': 'mca'}, storage_type='session'),
-        html.P("Number of components:"),
+        dcc.Markdown('''
+            ##### Number of components:
+            '''),
         dcc.RadioItems(
-                id='mca-components',
-                options=[{'label': i, 'value': i} for i in [2, 3]],
-                value=2,
-                labelStyle={'margin-right': '12px'}
-            ),
+            id='mca-components',
+            options=[{'label': i, 'value': i} for i in [2, 3]],
+            value=2,
+            labelStyle={'margin-right': '12px'}
+        ),
+
+        dbc.Button("Generate", color='primary', outline=True, id={'generate': 'mca'}),
+
 
         html.Div([dcc.Graph(id='mca-graphic', style={'height': '90vh', 'width': '90vh'})],
             style = {'width': '100%', 'display': 'flex', 'align-items': 'center', 'justify-content': 'center'}
@@ -48,9 +53,11 @@ def create_visualization_mca(dff):
 #Callback for the mca 
 @app.callback(Output('mca-graphic', 'figure'),
               Output({'type': 'points', 'method': 'mca'}, 'data'),
-              Input("mca-components", "value"),
-              State('data', 'data'))
-def mca(n_components, dff):
+              Input({'generate': 'mca'}, 'n_clicks'),
+              State("mca-components", "value"),
+              State('data', 'data'),
+              prevent_initial_call=True)
+def mca(n_clicks, n_components, dff):
     if dff is None:
         raise PreventUpdate
             
