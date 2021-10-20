@@ -23,9 +23,9 @@ def create_mds_figure(n_components, df, components, color_graph, categories, str
 
 def fill_figure(n_components, df, data, metrics, color_graph, categories=None, method=None):
     fig = go.Figure()
-    string = 'PC' if method == 'pca' or method == 'kpca' else 'LD' if method == 'fda' else 'Component' if method == 'mca' else 'Dimension'
+    string = 'PC' if method == 'pca' or method == 'kpca' else 'LD' if method == 'lda' else 'Component' if method == 'mca' else 'Dimension'
     if n_components == 2:
-        if method in ['pca', 'fda', 'kpca', 'mds', 'tSNE']:
+        if method in ['pca', 'lda', 'kpca', 'mds', 'tSNE']:
             for category in df[categories].unique():
                 indexes = df.index[df[categories] == category].tolist()
                 fig.add_trace(go.Scatter(
@@ -53,7 +53,7 @@ def fill_figure(n_components, df, data, metrics, color_graph, categories=None, m
 
 
     elif n_components == 3:
-        if method in ['pca', 'fda', 'kpca', 'mds', 'tSNE']:
+        if method in ['pca', 'lda', 'kpca', 'mds', 'tSNE']:
             for category in df[categories].unique():
                 indexes = df.index[df[categories] == category].tolist()
                 fig.add_trace(go.Scatter3d(

@@ -15,6 +15,7 @@ from dash.dependencies import Input, Output, State
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.impute import KNNImputer
+from sklearn.impute import SimpleImputer
 
 from detect_delimiter import detect
 
@@ -108,8 +109,12 @@ def discretize(df, categorical_cols):
     return df
 
 
-def impute_missing(df):
-    imputer = KNNImputer()
+def impute_missing(df, convert):
+    if 'numerical' in convert:
+        imputer = KNNImputer()
+    else:
+        imputer = SimpleImputer(strategy='most_frequent')
+
     imputer.fit_transform(df)
     return df
 

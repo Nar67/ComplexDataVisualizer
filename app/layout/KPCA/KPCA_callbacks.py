@@ -22,10 +22,10 @@ hidden = {
     'coef0-div': ['poly', 'sigmoid'],
 }
 
-@app.callback(Output({'div': MATCH}, 'hidden'),
+@app.callback(Output({'kpca-div': MATCH}, 'hidden'),
               Input('kernel', 'value'))
 def show_input(kernel):
-    return kernel not in hidden[dash.callback_context.outputs_list['id']['div']]
+    return kernel not in hidden[dash.callback_context.outputs_list['id']['kpca-div']]
 
 @app.callback(Output('KPCA-layout', 'children'),
               Input('data', 'data'),
@@ -46,7 +46,7 @@ def create_visualization_KPCA(dff, ds_info):
                 options=[{'label': i, 'value': i} for i in ['linear', 'poly', 'rbf', 'sigmoid', 'cosine', 'precomputed']],
                 value='linear'
             ),
-            html.Div(id={'div': 'gamma-div'}, hidden=True, children=[
+            html.Div(id={'kpca-div': 'gamma-div'}, hidden=True, children=[
                 dcc.Markdown('''
                     ##### Choose gamma for rbf, poly and sigmoid kernels:
                     '''),                

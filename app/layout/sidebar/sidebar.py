@@ -14,7 +14,7 @@ sidebar = html.Div(
                 dbc.NavLink("Table View", href="/table", id="table-link", active="exact"),
                 dbc.NavLink("Visualization", href="/visualization", id="visualization-link", active="exact"),
                 dbc.NavLink("PCA", href="/pca", id="pca-link", active="exact"),
-                dbc.NavLink("FDA", href="/fda", id="fda-link", active="exact"),
+                dbc.NavLink("LDA", href="/lda", id="lda-link", active="exact"),
                 dbc.NavLink("MCA", href="/mca", id="mca-link", active="exact"),
                 dbc.NavLink("t-SNE", href="/tSNE", id="tSNE-link", active="exact"),
                 dbc.NavLink("K-PCA", href="/KPCA", id="KPCA-link", active="exact"),

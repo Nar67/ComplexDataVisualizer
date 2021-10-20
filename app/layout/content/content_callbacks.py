@@ -8,7 +8,7 @@ import dash_core_components as dcc
 from layout.visualization.visualization import visualization
 from layout.data_table.data_table import data_table
 from layout.pca.pca_callbacks import pca_view
-from layout.fda.fda_callbacks import fda_view
+from layout.lda.lda_callbacks import lda_view
 from layout.mca.mca_callbacks import mca_view
 from layout.tSNE.tSNE_callbacks import tSNE_view
 from layout.KPCA.KPCA_callbacks import KPCA_view
@@ -30,8 +30,8 @@ def render_page_content(pathname):
         return visualization
     elif pathname == "/pca":
         return pca_view
-    elif pathname == "/fda":
-        return fda_view
+    elif pathname == "/lda":
+        return lda_view
     elif pathname == "/mca":
         return mca_view
     elif pathname == "/tSNE":
