@@ -56,15 +56,13 @@ def create_visualization_mca(dff):
               Input({'generate': 'mca'}, 'n_clicks'),
               State("mca-components", "value"),
               State('data', 'data'),
+              State('dataset-info', 'data'),
               prevent_initial_call=True)
-def mca(n_clicks, n_components, dff):
+def mca(n_clicks, n_components, dff, ds_info):
     if dff is None:
         raise PreventUpdate
             
     df = pd.read_json(dff, orient='split')
-
-    # if not check_all_categorical(df):
-    #     return
 
     mca = MCA(n_components=n_components)
     components = mca.fit_transform(df)
@@ -72,7 +70,8 @@ def mca(n_clicks, n_components, dff):
     return create_mca_figure(
                     n_components, 
                     df, 
-                    components, 
+                    components.to_numpy(),
+                    ds_info['label_column'],
                     mca.explained_inertia_,
             ), pd.DataFrame(components, columns=[i for i in range(n_components)]).to_json(date_format='iso', orient='split')
 

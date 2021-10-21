@@ -7,41 +7,32 @@ def create_figure(n_components, df, components, color_graph, categories, explain
         draw_arrows(fig, n_components, df, pca.components_.T, categories)
     return fig
 
-def create_mca_figure(n_components, df, components, explained_inertia):
-    return fill_figure(n_components, df, components, None, True, explained_inertia, method='mca')
+def create_mca_figure(n_components, df, components, categories, explained_inertia):
+    return fill_figure(n_components, df, components, None, True, categories=categories, method='mca')
      
 
 def create_figure_tSNE(n_components, df, components, color_graph, categories, divergence):
     fig = fill_figure(n_components, df, components, None, color_graph, categories=categories, method='tSNE')
-    fig.update_layout(title='Divergence: {div}'.format(div=divergence))
+    fig.update_layout(title='Divergence: {div:.2f}'.format(div=divergence))
     return fig
 
 def create_mds_figure(n_components, df, components, color_graph, categories, stress):
     fig = fill_figure(n_components, df, components, None, color_graph, categories=categories, method='mds')
-    fig.update_layout(title='Stress: {st}'.format(st=stress))
+    fig.update_layout(title='Stress: {st:.2f}'.format(st=stress))
     return fig
 
 def fill_figure(n_components, df, data, metrics, color_graph, categories=None, method=None):
     fig = go.Figure()
     string = 'PC' if method == 'pca' or method == 'kpca' else 'LD' if method == 'lda' else 'Component' if method == 'mca' else 'Dimension'
     if n_components == 2:
-        if method in ['pca', 'lda', 'kpca', 'mds', 'tSNE']:
-            for category in df[categories].unique():
-                indexes = df.index[df[categories] == category].tolist()
-                fig.add_trace(go.Scatter(
-                        x=[data[i][0] for i in indexes],
-                        y=[data[i][1] for i in indexes],
-                        mode='markers',
-                        name=str(category),
-                        hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
-            ))
-        else:
-            indexes = df.index.tolist()
+        for category in df[categories].unique():
+            indexes = df.index[df[categories] == category].tolist()
             fig.add_trace(go.Scatter(
-                x=data[:][0],
-                y=data[:][1],
-                mode='markers',
-                hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
+                    x=[data[i][0] for i in indexes],
+                    y=[data[i][1] for i in indexes],
+                    mode='markers',
+                    name=str(category),
+                    hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
         ))
         if metrics is not None:
             fig.update_xaxes(
@@ -53,27 +44,16 @@ def fill_figure(n_components, df, data, metrics, color_graph, categories=None, m
 
 
     elif n_components == 3:
-        if method in ['pca', 'lda', 'kpca', 'mds', 'tSNE']:
-            for category in df[categories].unique():
-                indexes = df.index[df[categories] == category].tolist()
-                fig.add_trace(go.Scatter3d(
-                        x=[data[i][0] for i in indexes],
-                        y=[data[i][1] for i in indexes],
-                        z=[data[i][2] for i in indexes],
-                        mode='markers',
-                        name=str(category),
-                        hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
-                ))
-        else:
-            indexes = df.index.tolist()
+        for category in df[categories].unique():
+            indexes = df.index[df[categories] == category].tolist()
             fig.add_trace(go.Scatter3d(
-                x=data[:][0],
-                y=data[:][1],
-                z=data[:][2],
-                mode='markers',
-                hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
-                ))
-        
+                    x=[data[i][0] for i in indexes],
+                    y=[data[i][1] for i in indexes],
+                    z=[data[i][2] for i in indexes],
+                    mode='markers',
+                    name=str(category),
+                    hovertemplate=get_hovertemplate(n_components, indexes, string), text=[str(i) for i in indexes]
+            ))        
         if metrics is not None:
             fig.update_layout(scene = dict(
                 xaxis_title="{ax} 1 ({var:.1f}%)".format(ax=string, var=metrics[0]*100),

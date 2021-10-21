@@ -48,11 +48,10 @@ def upload_info(df):
                 dcc.RadioItems(
                     id='convert-vars',
                     options=[
-                        {'label': ' Ignore (Only one type will be visualized at a time)', 'value': 'ignore'},
                         {'label': ' Convert all to numerical', 'value': 'conv_numerical'},
                         {'label': ' Convert all to categorical', 'value': 'conv_categorical'}
                     ],
-                    value="ignore",
+                    value="conv_numerical",
                     labelStyle={'margin-right': '12px', 'margin-top': '12px', 'margin-bottom': '12px', 'display': 'block'}
                     ),
             ]),

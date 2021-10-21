@@ -2,6 +2,7 @@ import pandas as pd
 import base64
 import datetime
 import io
+import numpy as np
 
 import dash_html_components as html
 import dash_core_components as dcc
@@ -48,6 +49,8 @@ def show_input(labeled):
 def upload_dataset(content, name, dates):
     if content is not None:
         df = parse_contents(content, name, dates)
+        df.replace([np.inf, -np.inf, '?'], np.nan, inplace=True)
+
         return df.to_json(date_format='iso', orient='split')
     else:
         return None
@@ -80,11 +83,12 @@ def save_upload_options(n_clicks, dataset_kind, column_text, labeled, label_colu
         raise PreventUpdate        
     df = pd.read_json(dff, orient='split')
     
-    if convert != 'ignore':
-        df = convert_vars(df, parse_categorical_column_text(column_text), convert)
-    
+    if column_text != None:
+        df = convert_vars(df, parse_categorical_column_text(column_text), convert) 
+
+
     if missing_values == 'impute':
-        df = impute_missing(df)
+        df = impute_missing(df, convert)
     
     return {'dataset_type': dataset_kind, 
             'column_info': parse_categorical_column_text(column_text) if column_text != None else None,

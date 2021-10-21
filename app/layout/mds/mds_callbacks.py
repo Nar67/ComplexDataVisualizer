@@ -35,6 +35,7 @@ def create_visualization_mds(dff):
             dcc.Checklist(
                 id='metric-checklist',
                 options=[{'label': 'Use metric MDS', 'value': 'True'}],
+                value=['True'],
                 style={'margin-top': '20px'}
                 ),
             ]),
@@ -79,7 +80,6 @@ def mds(n_clicks, n_components, dff, metric, dissimilarity, ds_info):
 
     mds = MDS(n_components=n_components, metric=metric, dissimilarity=dissimilarity)
     components = mds.fit_transform(df.loc[:, df.columns != ds_info['label_column']])
-
     return create_mds_figure(
                     n_components, 
                     df, 
