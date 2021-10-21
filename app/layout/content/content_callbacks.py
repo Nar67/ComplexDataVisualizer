@@ -16,14 +16,18 @@ from layout.mds.mds_callbacks import mds_view
 from layout.upload.upload import upload_view
 
 
-
+home_content = dcc.Markdown(
+    '''
+    # Welcome to the Complex Data Visualizer!
+    '''
+, style={'margin-top': '30px'})
 
 @app.callback(
     Output("page-content", "children"), 
     Input("url", "pathname"))
 def render_page_content(pathname):
     if pathname == "/":
-        return html.Div([html.P("This is the content of Home!")])
+        return home_content
     elif pathname == "/table":
         return data_table
     elif pathname == "/visualization":
