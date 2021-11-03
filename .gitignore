@@ -130,3 +130,6 @@ dmypy.json
 
 #datasets
 datasets/
+
+#compressed files
+*.zip

@@ -13,17 +13,17 @@ def create_mca_figure(n_components, df, components, categories, explained_inerti
 
 def create_figure_tSNE(n_components, df, components, color_graph, categories, divergence):
     fig = fill_figure(n_components, df, components, None, color_graph, categories=categories, method='tSNE')
-    fig.update_layout(title='Divergence: {div:.2f}'.format(div=divergence))
+    fig.update_layout(title=f'Divergence: {divergence:.2f}')
     return fig
 
 def create_mds_figure(n_components, df, components, color_graph, categories, stress):
     fig = fill_figure(n_components, df, components, None, color_graph, categories=categories, method='mds')
-    fig.update_layout(title='Stress: {st:.2f}'.format(st=stress))
+    fig.update_layout(title=f'Stress: {stress:.2f}')
     return fig
 
 def fill_figure(n_components, df, data, metrics, color_graph, categories=None, method=None):
     fig = go.Figure()
-    string = 'PC' if method == 'pca' or method == 'kpca' else 'LD' if method == 'lda' else 'Component' if method == 'mca' else 'Dimension'
+    axis = get_axis_string(method)
     if n_components == 2:
         for category in df[categories].unique():
             indexes = df.index[df[categories] == category].tolist()
@@ -36,11 +36,11 @@ def fill_figure(n_components, df, data, metrics, color_graph, categories=None, m
         ))
         if metrics is not None:
             fig.update_xaxes(
-                title_text = "{ax} 1 ({var:.1f}%)".format(ax=string, var=metrics[0]*100)
+                title_text = f'{axis} 1 ({metrics[0]*100:.1f}%)'
             )
             fig.update_yaxes(
-                title_text = "{ax} 2 ({var:.1f}%)".format(ax=string, var=metrics[1]*100),
-        )
+                title_text = f'{axis} 2 ({metrics[1]*100:.1f}%)'
+            )
 
 
     elif n_components == 3:
@@ -56,9 +56,9 @@ def fill_figure(n_components, df, data, metrics, color_graph, categories=None, m
             ))        
         if metrics is not None:
             fig.update_layout(scene = dict(
-                xaxis_title="{ax} 1 ({var:.1f}%)".format(ax=string, var=metrics[0]*100),
-                yaxis_title="{ax} 2 ({var:.1f}%)".format(ax=string, var=metrics[1]*100),
-                zaxis_title="{ax} 3 ({var:.1f}%)".format(ax=string, var=metrics[2]*100),
+                xaxis_title=f'{axis} 1 ({metrics[0]*100:.1f}%)',
+                yaxis_title=f'{axis} 2 ({metrics[1]*100:.1f}%)',
+                zaxis_title=f'{axis} 3 ({metrics[2]*100:.1f}%)',
             ))
         #uses 'data' which preserves the proportion of axes ranges unless one axis is 4 times the others, then 'cube' is used
         fig.update_scenes(aspectmode='auto')  
@@ -84,6 +84,15 @@ def get_hovertemplate(n_components, indexes, string):
     else:
         return '<br><b>' + string + '1</b>: %{x}<br>' + '<br><b>' + string + '2</b>: %{y}<br>' + '<br><b>' + string + '3</b>: %{z}<br>' + '<br><b>Index</b>: %{text}<br><extra></extra>'
 
+def get_axis_string(method):
+    if method == 'pca' or method == 'kpca':
+        return 'PC'  
+    elif method == 'lda':
+        return 'LD' 
+    elif method == 'mca':
+        return 'Component' 
+    else:
+        return 'Dimension'
 
 def draw_arrows(fig, n_components, df, components, categories):
     if n_components == 2:
